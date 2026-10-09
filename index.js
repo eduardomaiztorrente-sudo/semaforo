@@ -99,8 +99,7 @@ async function extraerIncidenciasDeFynkus() {
 }
 
 // HTTP Health check endpoint
-functions.http('scrapearFynkus', async (req, res) => {
-  console.log('Request received:', req.method, req.path);
+functions.http('scrapearFynkus', async (req, res) => { `r`n  // Enable CORS `r`n  res.set('Access-Control-Allow-Origin', '*'); `r`n  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); `r`n  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization'); `r`n  `r`n  if (req.method === 'OPTIONS') { `r`n    return res.status(204).send(''); `r`n  } `r`n  `r`n  console.log('Request received:', req.method, req.path);
 
   try {
     // Healthcheck endpoint
@@ -135,3 +134,4 @@ functions.http('scrapearFynkus', async (req, res) => {
     });
   }
 });
+
