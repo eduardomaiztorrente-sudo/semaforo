@@ -1,14 +1,17 @@
-{
-  "name": "scrapear-fynkus",
-  "version": "1.0.0",
-  "description": "Cloud Function to scrape Fynkus and process with Gmail data",
+﻿{
+  "name": "semaforo",
+  "version": "3.0.0",
+  "description": "Semáforo de incidencias - Dashboard de gestión de incidencias",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "node index.js"
+    "dev": "node firestore-init.js",
+    "start": "node server.js"
   },
+  "keywords": ["incidencias", "dashboard", "firestore"],
+  "author": "Eduardo Máiz Torrente",
+  "license": "MIT",
   "dependencies": {
-    "@google-cloud/functions-framework": "^3.0.0",
-    "puppeteer": "^21.0.0",
     "firebase-admin": "^12.0.0"
   }
 }

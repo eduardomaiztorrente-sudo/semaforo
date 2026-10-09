@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semáforo v4.0 - Kanban Completo</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-sync {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-sync:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* KANBAN GRID */
+        .kanban-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .kanban-column {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .column-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .column-count {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* SCROLLBAR */
+        .cards-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .cards-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .cards-container::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .cards-container::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        /* TARJETAS KANBAN */
+        .card {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 10px;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+            border-color: #667eea;
+        }
+
+        .card-checkbox {
+            margin-top: 2px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .card-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            word-wrap: break-word;
+        }
+
+        .card-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .badge-comunidad {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-proveedor {
+            background: #e9d5ff;
+            color: #6b21a8;
+        }
+
+        .badge-estado {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .badge-email {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-task {
+            background: #fce7f3;
+            color: #831843;
+        }
+
+        .card-footer {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .card-from {
+            font-size: 11px;
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .card-snippet {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .card-date {
+            font-size: 11px;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center;
+            padding: 30px 10px;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .empty-state-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .kanban-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kanban-column {
+                min-height: 400px;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header h1 {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>📊 Semáforo v4.0</h1>
+            <button class="btn-sync" id="syncBtn" onclick="sincronizar()">🔄 Sincronizar</button>
+        </div>
+
+        <!-- KANBAN GRID -->
+        <div class="kanban-grid" id="kanbanGrid">
+            <!-- Incidencias -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">📋 Incidencias</span>
+                    <span class="column-count" id="count-incidencias">0</span>
+                </div>
+                <div class="cards-container" id="column-incidencias"></div>
+            </div>
+
+            <!-- Borradores -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">📝 Borradores</span>
+                    <span class="column-count" id="count-borradores">0</span>
+                </div>
+                <div class="cards-container" id="column-borradores"></div>
+            </div>
+
+            <!-- Dudas -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">❓ Dudas</span>
+                    <span class="column-count" id="count-dudas">0</span>
+                </div>
+                <div class="cards-container" id="column-dudas"></div>
+            </div>
+
+            <!-- Calendario -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">📅 Calendario</span>
+                    <span class="column-count" id="count-calendar">0</span>
+                </div>
+                <div class="cards-container" id="column-calendar"></div>
+            </div>
+
+            <!-- Correos -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">📧 Correos</span>
+                    <span class="column-count" id="count-emails">0</span>
+                </div>
+                <div class="cards-container" id="column-emails"></div>
+            </div>
+
+            <!-- Tareas -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">✓ Tareas</span>
+                    <span class="column-count" id="count-tasks">0</span>
+                </div>
+                <div class="cards-container" id="column-tasks"></div>
+            </div>
+
+            <!-- Completadas -->
+            <div class="kanban-column">
+                <div class="column-header">
+                    <span class="column-title">✅ Completadas</span>
+                    <span class="column-count" id="count-completadas">0</span>
+                </div>
+                <div class="cards-container" id="column-completadas"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURACIÓN FIREBASE
+        // ============================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyVGUFxn0V3t3V3t3V3t3V3t3V3t3V3t3",
+            authDomain: "semaforo-fincas-5daea.firebaseapp.com",
+            projectId: "semaforo-fincas-5daea",
+            storageBucket: "semaforo-fincas-5daea.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // ============================================================
+        // DATOS DE PRUEBA
+        // ============================================================
+        const mockCalendarData = [
+            {
+                title: "Reunión comunidad Soto 4",
+                start: "10:00",
+                end: "11:00",
+                location: "Soto 4"
+            },
+            {
+                title: "Llamada con Fontanería López",
+                start: "14:30",
+                end: "15:00",
+                location: "Teléfono"
+            }
+        ];
+
+        const mockEmailData = [
+            {
+                subject: "Reparación tubería - URGENTE",
+                from: "info@fontaneria.com",
+                date: "Hoy 09:30",
+                snippet: "Se ha detectado una fuga en la tubería..."
+            },
+            {
+                subject: "Presupuesto ascensor revisión anual",
+                from: "contacto@ascensores.com",
+                date: "Hoy 08:15",
+                snippet: "Adjuntamos presupuesto para la revisión..."
+            },
+            {
+                subject: "Inspección eléctrica completada",
+                from: "empresa@electricidad.com",
+                date: "Ayer 17:45",
+                snippet: "Se ha realizado la inspección. Todo conforme..."
+            }
+        ];
+
+        const mockTasksData = [
+            {
+                title: "Seguimiento reparación tubería Soto 4",
+                due: "Hoy",
+                notes: "Verificar que se ha completado"
+            },
+            {
+                title: "Contactar con proveedor ascensor",
+                due: "Mañana",
+                notes: "Confirmar fecha de revisión"
+            },
+            {
+                title: "Revisar presupuestos pendientes",
+                due: "En 5 días",
+                notes: "Comparar precios de 3 proveedores"
+            }
+        ];
+
+        // ============================================================
+        // FUNCIONES PRINCIPALES
+        // ============================================================
+        async function sincronizar() {
+            const btn = document.getElementById('syncBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div> Sincronizando...';
+
+            try {
+                await cargarGestiones();
+                mostrarCalendario();
+                mostrarCorreos();
+                mostrarTareas();
+
+                btn.innerHTML = '✅ Sincronizado';
+                setTimeout(() => {
+                    btn.innerHTML = '🔄 Sincronizar';
+                    btn.disabled = false;
+                }, 2000);
+            } catch (error) {
+                console.error('Error sincronizando:', error);
+                btn.innerHTML = '❌ Error';
+                setTimeout(() => {
+                    btn.innerHTML = '🔄 Sincronizar';
+                    btn.disabled = false;
+                }, 2000);
+            }
+        }
+
+        async function cargarGestiones() {
+            const tipos = ['incidencias', 'borradores', 'dudas'];
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            const mañana = new Date(hoy);
+            mañana.setDate(mañana.getDate() + 1);
+
+            for (const tipo of tipos) {
+                try {
+                    const q = firebase.firestore.query(
+                        db.collection(tipo),
+                        firebase.firestore.where('fechaVencimiento', '<', firebase.firestore.Timestamp.fromDate(mañana)),
+                        firebase.firestore.where('completada', '==', false)
+                    );
+
+                    const snapshot = await q.get();
+                    const gestiones = [];
+
+                    snapshot.forEach(doc => {
+                        gestiones.push({id: doc.id, tipo: tipo, ...doc.data()});
+                    });
+
+                    mostrarGestiones(tipo, gestiones);
+                } catch (e) {
+                    console.error(`Error cargando ${tipo}:`, e);
+                    mostrarGestiones(tipo, []);
+                }
+            }
+
+            // Cargar completadas
+            try {
+                const qCompletadas = firebase.firestore.query(
+                    db.collection('incidencias'),
+                    firebase.firestore.where('completada', '==', true)
+                );
+                const snapshotCompletadas = await qCompletadas.get();
+                const completadas = [];
+                snapshotCompletadas.forEach(doc => {
+                    completadas.push({id: doc.id, tipo: 'incidencias', ...doc.data()});
+                });
+                mostrarGestiones('completadas', completadas);
+            } catch (e) {
+                console.error('Error cargando completadas:', e);
+                mostrarGestiones('completadas', []);
+            }
+        }
+
+        function mostrarGestiones(tipo, gestiones) {
+            const column = document.getElementById(`column-${tipo}`);
+            const count = document.getElementById(`count-${tipo}`);
+
+            column.innerHTML = '';
+            count.textContent = gestiones.length;
+
+            if (gestiones.length === 0) {
+                column.innerHTML = '<div class="empty-state"><div class="empty-state-icon">—</div><p>Vacío</p></div>';
+                return;
+            }
+
+            gestiones.forEach(g => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const fecha = g.fechaVencimiento ?
+                    new Date(g.fechaVencimiento.seconds * 1000).toLocaleDateString('es-ES') :
+                    'Sin fecha';
+
+                const badgesHTML = `
+                    <span class="badge badge-comunidad">${g.comunidad}</span>
+                    <span class="badge badge-proveedor">${g.proveedor}</span>
+                    <span class="badge badge-estado">${g.estado}</span>
+                `;
+
+                card.innerHTML = `
+                    <input type="checkbox" class="card-checkbox" ${g.completada ? 'checked' : ''}
+                        onchange="marcarCompletada('${g.tipo}', '${g.id}', this.checked)">
+                    <div class="card-content">
+                        <div class="card-title">${g.asunto}</div>
+                        <div class="card-badges">${badgesHTML}</div>
+                        <div class="card-footer">📅 ${fecha}</div>
+                    </div>
+                `;
+
+                column.appendChild(card);
+            });
+        }
+
+        async function marcarCompletada(tipo, docId, completada) {
+            try {
+                await db.collection(tipo).doc(docId).update({
+                    completada: completada
+                });
+                await cargarGestiones();
+            } catch (error) {
+                console.error('Error marcando completada:', error);
+            }
+        }
+
+        function mostrarCalendario() {
+            const column = document.getElementById('column-calendar');
+            const count = document.getElementById('count-calendar');
+
+            column.innerHTML = '';
+            count.textContent = mockCalendarData.length;
+
+            if (mockCalendarData.length === 0) {
+                column.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><p>Sin eventos</p></div>';
+                return;
+            }
+
+            mockCalendarData.forEach(event => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.flexDirection = 'column';
+                card.style.gap = '8px';
+                card.onclick = () => window.open('https://calendar.google.com', '_blank');
+
+                card.innerHTML = `
+                    <div class="card-title">⏰ ${event.start} - ${event.end}</div>
+                    <div class="card-title">${event.title}</div>
+                    <div class="badge badge-email">${event.location}</div>
+                `;
+
+                column.appendChild(card);
+            });
+        }
+
+        function mostrarCorreos() {
+            const column = document.getElementById('column-emails');
+            const count = document.getElementById('count-emails');
+
+            column.innerHTML = '';
+            count.textContent = mockEmailData.length;
+
+            if (mockEmailData.length === 0) {
+                column.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📧</div><p>Sin correos</p></div>';
+                return;
+            }
+
+            mockEmailData.forEach(email => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.flexDirection = 'column';
+                card.style.gap = '6px';
+                card.onclick = () => window.open('https://gmail.com', '_blank');
+
+                card.innerHTML = `
+                    <div class="card-from">${email.from}</div>
+                    <div class="card-title">${email.subject}</div>
+                    <div class="card-snippet">${email.snippet}</div>
+                    <div class="card-footer">${email.date}</div>
+                `;
+
+                column.appendChild(card);
+            });
+        }
+
+        function mostrarTareas() {
+            const column = document.getElementById('column-tasks');
+            const count = document.getElementById('count-tasks');
+
+            column.innerHTML = '';
+            count.textContent = mockTasksData.length;
+
+            if (mockTasksData.length === 0) {
+                column.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✓</div><p>Sin tareas</p></div>';
+                return;
+            }
+
+            mockTasksData.forEach(task => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.flexDirection = 'column';
+                card.style.gap = '6px';
+                card.onclick = () => window.open('https://tasks.google.com', '_blank');
+
+                card.innerHTML = `
+                    <div class="card-title">${task.title}</div>
+                    <div class="badge badge-task">📅 ${task.due}</div>
+                    ${task.notes ? `<div class="card-snippet">${task.notes}</div>` : ''}
+                `;
+
+                column.appendChild(card);
+            });
+        }
+
+        // ============================================================
+        // INICIALIZACIÓN
+        // ============================================================
+        window.addEventListener('load', () => {
+            cargarGestiones();
+            mostrarCalendario();
+            mostrarCorreos();
+            mostrarTareas();
+
+            // Auto-sincronizar cada 30 segundos
+            setInterval(() => {
+                cargarGestiones();
+            }, 30000);
+        });
+    </script>
+</body>
+</html>

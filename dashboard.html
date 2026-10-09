@@ -150,6 +150,7 @@
             color: white;
             padding: 20px;
             margin: 0;
+            font-size: 1.1em;
         }
 
         table {
@@ -170,7 +171,7 @@
         td {
             padding: 15px;
             border-bottom: 1px solid #eee;
-            color: #666;
+            color: #333;
             font-size: 0.9em;
         }
 
@@ -199,6 +200,11 @@
         .status-badge.resuelto {
             background: #E8F5E9;
             color: #388E3C;
+        }
+
+        .status-badge.duda {
+            background: #E3F2FD;
+            color: #1976D2;
         }
 
         .empty-state {
@@ -266,6 +272,32 @@
         .refresh-btn:active {
             transform: scale(0.98);
         }
+
+        .incident-row {
+            transition: background 0.2s ease;
+        }
+
+        .incident-row:hover {
+            background: #f0f0f5;
+        }
+
+        .comunidad-badge {
+            background: #E3F2FD;
+            color: #1565C0;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: 500;
+            font-size: 0.85em;
+        }
+
+        .proveedor-badge {
+            background: #F3E5F5;
+            color: #6A1B9A;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: 500;
+            font-size: 0.85em;
+        }
     </style>
 </head>
 <body>
@@ -276,7 +308,7 @@
                     <h1>🚦 Semáforo de Incidencias</h1>
                     <p style="color: #666; margin-top: 5px;">Panel de control de gestión de incidencias</p>
                 </div>
-                <button class="refresh-btn" onclick="refreshData()">Actualizar</button>
+                <button class="refresh-btn" onclick="refreshData()">✓ Sincronizar</button>
             </div>
             <div class="status-info">
                 <span class="last-update">Última actualización: <span id="lastUpdate">--:--:--</span></span>
@@ -315,28 +347,27 @@
         </div>
 
         <div class="incidents-table">
-            <h3>Últimas Incidencias</h3>
+            <h3>Últimas Incidencias - Detalles Claros</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Fecha Alta</th>
-                        <th>Comunidad</th>
-                        <th>Propiedad</th>
-                        <th>Tipo</th>
-                        <th>Asunto</th>
-                        <th>Estado</th>
+                        <th style="width: 12%;">Fecha</th>
+                        <th style="width: 25%;">Comunidad</th>
+                        <th style="width: 35%;">Asunto</th>
+                        <th style="width: 18%;">Proveedor</th>
+                        <th style="width: 10%;">Estado</th>
                     </tr>
                 </thead>
                 <tbody id="incidentsTableBody">
                     <tr>
-                        <td colspan="6" class="loading">Cargando incidencias...</td>
+                        <td colspan="5" class="loading">Cargando incidencias...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <footer>
-            <p>Semáforo de Incidencias v1.0 | Sistema de gestión para administradores de fincas</p>
+            <p>Semáforo de Incidencias v2.0 | Sistema de gestión para administradores de fincas</p>
         </footer>
     </div>
 
@@ -344,7 +375,6 @@
         // Firebase Configuration
         const firebaseConfig = {
             projectId: 'semaforo-fincas',
-            // Add other config here
         };
 
         // Initialize Firebase
@@ -397,24 +427,41 @@
             const tbody = document.getElementById('incidentsTableBody');
 
             if (!incidents || incidents.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay incidencias registradas</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No hay incidencias registradas</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = incidents.slice(0, 10).map(incident => `
-                <tr>
-                    <td>${incident.fechaAlta || '--'}</td>
-                    <td>${incident.comunidad || '--'}</td>
-                    <td>${incident.propiedad || '--'}</td>
-                    <td>${incident.tipo || '--'}</td>
-                    <td>${incident.asunto || '--'}</td>
-                    <td>
-                        <span class="status-badge ${incident.estado?.toLowerCase().replace(' ', '-') || 'abierto'}">
-                            ${incident.estado || 'Desconocido'}
-                        </span>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = incidents.slice(0, 15).map(incident => {
+                const fecha = formatFecha(incident.fechaAlta);
+                const comunidad = incident.comunidad || 'Sin especificar';
+                const asunto = incident.asunto || 'Sin descripción';
+                const proveedor = incident.proveedor || 'No asignado';
+                const estado = incident.estado || 'Desconocido';
+                
+                return `
+                    <tr class="incident-row">
+                        <td>${fecha}</td>
+                        <td><span class="comunidad-badge">${comunidad.toUpperCase()}</span></td>
+                        <td style="font-weight: 500;">${asunto}</td>
+                        <td><span class="proveedor-badge">${proveedor}</span></td>
+                        <td>
+                            <span class="status-badge ${estado.toLowerCase().replace(/\s+/g, '-')}">
+                                ${estado}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function formatFecha(fecha) {
+            if (!fecha) return '--';
+            try {
+                const date = new Date(fecha);
+                return date.toLocaleDateString('es-ES', { year: '2-digit', month: '2-digit', day: '2-digit' });
+            } catch {
+                return fecha;
+            }
         }
 
         function updateStatusIndicator(status) {
