@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semáforo de Incidencias - Dashboard Interactivo</title>
+    <title>Semáforo de Incidencias</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -18,12 +13,7 @@
             padding: 20px;
             color: #333;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
+        .container { max-width: 1400px; margin: 0 auto; }
         .header {
             background: white;
             padding: 30px;
@@ -36,12 +26,7 @@
             flex-wrap: wrap;
             gap: 20px;
         }
-
-        .header h1 {
-            font-size: 28px;
-            color: #667eea;
-        }
-
+        .header h1 { font-size: 28px; color: #667eea; }
         .sync-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -51,52 +36,24 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
-
-        .sync-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
-        }
-
+        .sync-button:hover { transform: translateY(-2px); }
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
             margin-bottom: 30px;
         }
-
         .card {
             background: white;
             border-radius: 12px;
             padding: 25px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .card h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .card-content {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .items-list {
-            margin-top: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); }
+        .card h2 { color: #667eea; margin-bottom: 15px; font-size: 18px; }
+        .items-list { margin-top: 15px; max-height: 300px; overflow-y: auto; }
         .item {
             background: #f8f9fa;
             border: 1px solid #e0e0e0;
@@ -106,27 +63,9 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-
-        .item:hover {
-            background: #e8eaf6;
-            border-color: #667eea;
-            transform: translateX(5px);
-        }
-
-        .item-title {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .item-desc {
-            font-size: 12px;
-            color: #999;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
+        .item:hover { background: #e8eaf6; border-color: #667eea; transform: translateX(5px); }
+        .item-title { font-weight: 600; color: #333; margin-bottom: 4px; }
+        .item-desc { font-size: 12px; color: #999; }
         .status-badge {
             display: inline-block;
             padding: 6px 12px;
@@ -134,24 +73,9 @@
             font-size: 12px;
             font-weight: 600;
             margin-top: 10px;
-        }
-
-        .status-loading {
-            background: #f0f0f0;
-            color: #666;
-        }
-
-        .status-ready {
             background: #d4edda;
             color: #155724;
         }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -164,11 +88,7 @@
             justify-content: center;
             align-items: center;
         }
-
-        .modal.active {
-            display: flex;
-        }
-
+        .modal.active { display: flex; }
         .modal-content {
             background: white;
             border-radius: 12px;
@@ -179,7 +99,6 @@
             overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
-
         .modal-header {
             display: flex;
             justify-content: space-between;
@@ -188,53 +107,12 @@
             border-bottom: 2px solid #667eea;
             padding-bottom: 15px;
         }
-
-        .modal-header h2 {
-            color: #667eea;
-            margin: 0;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #999;
-            transition: color 0.2s;
-        }
-
-        .close-btn:hover {
-            color: #333;
-        }
-
-        .modal-body {
-            margin-bottom: 20px;
-        }
-
-        .modal-field {
-            margin-bottom: 12px;
-        }
-
-        .modal-label {
-            font-weight: 600;
-            color: #667eea;
-            margin-bottom: 4px;
-            display: block;
-        }
-
-        .modal-value {
-            color: #333;
-            padding: 8px;
-            background: #f8f9fa;
-            border-radius: 4px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
+        .modal-header h2 { color: #667eea; margin: 0; }
+        .close-btn { background: none; border: none; font-size: 28px; cursor: pointer; color: #999; }
+        .modal-field { margin-bottom: 12px; }
+        .modal-label { font-weight: 600; color: #667eea; margin-bottom: 4px; display: block; }
+        .modal-value { color: #333; padding: 8px; background: #f8f9fa; border-radius: 4px; }
+        .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; }
         .action-btn {
             flex: 1;
             min-width: 120px;
@@ -246,139 +124,56 @@
             font-weight: 600;
             transition: all 0.2s;
         }
-
-        .action-btn-complete {
-            background: #28a745;
-            color: white;
-        }
-
-        .action-btn-complete:hover {
-            background: #218838;
-            transform: translateY(-2px);
-        }
-
-        .action-btn-cancel {
-            background: #dc3545;
-            color: white;
-        }
-
-        .action-btn-cancel:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .action-btn-info {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .action-btn-info:hover {
-            background: #138496;
-            transform: translateY(-2px);
-        }
-
-        .footer {
-            text-align: center;
-            color: white;
-            font-size: 12px;
-            margin-top: 30px;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 20px;
-            color: #999;
-            font-size: 13px;
-        }
+        .action-btn-complete { background: #28a745; color: white; }
+        .action-btn-complete:hover { background: #218838; }
+        .action-btn-cancel { background: #dc3545; color: white; }
+        .action-btn-cancel:hover { background: #c82333; }
+        .footer { text-align: center; color: white; font-size: 12px; margin-top: 30px; }
+        .empty-state { text-align: center; padding: 20px; color: #999; font-size: 13px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Semáforo de Incidencias</h1>
-            <button class="sync-button" onclick="syncData()">
-                ✓ Sincronizar Datos
-            </button>
+            <h1>Semáforo de Incidencias v2.0</h1>
+            <button class="sync-button" onclick="syncData()">✓ Sincronizar</button>
         </div>
 
         <div class="cards-grid">
-            <!-- Tareas e Incidencias -->
             <div class="card">
-                <h2>📋 Tareas e Incidencias</h2>
-                <div class="card-content">
-                    <p>Gestión de tareas e incidencias en tiempo real</p>
-                    <div id="incidencias-list" class="items-list">
-                        <div class="empty-state">
-                            <span class="loading-spinner"></span>Cargando...
-                        </div>
-                    </div>
-                    <span class="status-badge status-loading" id="incidencias-status">
-                        Cargando...
-                    </span>
+                <h2>📋 Incidencias</h2>
+                <div id="incidencias-list" class="items-list">
+                    <div class="empty-state">Cargando...</div>
                 </div>
+                <span class="status-badge" id="incidencias-status">Cargando...</span>
             </div>
 
-            <!-- Borradores Gmail -->
             <div class="card">
-                <h2>📧 Borradores Gmail</h2>
-                <div class="card-content">
-                    <p>Borradores pendientes de envío</p>
-                    <div id="borradores-list" class="items-list">
-                        <div class="empty-state">Cargando...</div>
-                    </div>
-                    <span class="status-badge status-ready" id="borradores-status">
-                        ✓ Disponible
-                    </span>
+                <h2>📧 Borradores</h2>
+                <div id="borradores-list" class="items-list">
+                    <div class="empty-state">Cargando...</div>
                 </div>
+                <span class="status-badge" id="borradores-status">✓ Disponible</span>
             </div>
 
-            <!-- Dudas del Día -->
             <div class="card">
-                <h2>❓ Dudas del Día</h2>
-                <div class="card-content">
-                    <p>Preguntas y dudas pendientes de resolver</p>
-                    <div id="dudas-list" class="items-list">
-                        <div class="empty-state">Cargando...</div>
-                    </div>
-                    <span class="status-badge status-ready" id="dudas-status">
-                        ✓ Disponible
-                    </span>
+                <h2>❓ Dudas</h2>
+                <div id="dudas-list" class="items-list">
+                    <div class="empty-state">Cargando...</div>
                 </div>
+                <span class="status-badge" id="dudas-status">✓ Disponible</span>
             </div>
 
-            <!-- Completadas Hoy -->
             <div class="card">
-                <h2>✅ Completadas Hoy</h2>
-                <div class="card-content">
-                    <p>Tareas completadas durante el día</p>
-                    <div id="completadas-list" class="items-list">
-                        <div class="empty-state">Sin tareas completadas</div>
-                    </div>
-                    <span class="status-badge status-ready" id="completadas-count">
-                        0 completadas
-                    </span>
+                <h2>✅ Completadas</h2>
+                <div id="completadas-list" class="items-list">
+                    <div class="empty-state">Sin completadas</div>
                 </div>
+                <span class="status-badge" id="completadas-count">0</span>
             </div>
         </div>
     </div>
 
-    <!-- Modal para detalles -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -391,289 +186,151 @@
     </div>
 
     <div class="footer">
-        <p>Semáforo de Incidencias | Dashboard Interactivo | v2.0 | 2026-10-09</p>
+        <p>Semáforo de Incidencias | v2.0 | 2026-10-09</p>
     </div>
 
     <script>
-        console.log('✓ Aplicación Semáforo v2.0 cargada correctamente');
+        console.log('✓ Dashboard v2.0 iniciado');
 
-        // Estado global
         const state = {
             incidencias: [],
             borradores: [],
             dudas: [],
-            completadas: [],
-            currentModal: null
+            completadas: []
         };
 
-        // Cargar datos de localStorage
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('semaforoData');
-            if (saved) {
-                try {
-                    const data = JSON.parse(saved);
-                    state.dudas = data.dudas || [];
-                    state.completadas = data.completadas || [];
-                    console.log('✓ Datos cargados de localStorage');
-                } catch (e) {
-                    console.warn('Error al cargar de localStorage:', e);
-                }
-            }
-        }
+        function loadData() {
+            console.log('✓ Cargando datos...');
 
-        // Guardar datos en localStorage
-        function saveToLocalStorage() {
-            localStorage.setItem('semaforoData', JSON.stringify({
-                dudas: state.dudas,
-                completadas: state.completadas
-            }));
-        }
-
-        // Inicializar dudas del día si no existen
-        function initializeDudas() {
-            if (state.dudas.length === 0) {
-                state.dudas = [
-                    { id: 1, titulo: '¿Cuál es el estado de la incidencia #45?', descripcion: 'Revisar Fynkus', tipo: 'duda', fecha: new Date().toLocaleDateString() },
-                    { id: 2, titulo: '¿Se confirmó la cita con el proveedor?', descripcion: 'Pendiente de confirmación', tipo: 'duda', fecha: new Date().toLocaleDateString() },
-                    { id: 3, titulo: 'Revisar presupuesto Q4', descripcion: 'Análisis financiero', tipo: 'duda', fecha: new Date().toLocaleDateString() }
-                ];
-                saveToLocalStorage();
-            }
-        }
-
-        // Cargar incidencias de Cloud Run
-        async function loadIncidencias() {
-            try {
-                const response = await fetch('/api/proxy');
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.incidencias) {
-                        state.incidencias = data.incidencias.slice(0, 5).map((inc, idx) => ({
-                            id: idx,
-                            titulo: inc.asunto || inc.tipo,
-                            descripcion: `${inc.comunidad} - ${inc.propiedad}`,
-                            estado: inc.estado,
-                            proveedor: inc.proveedor,
-                            oficio: inc.oficio,
-                            tipo: 'incidencia',
-                            fecha: inc.fechaAlta
+            // Cargar incidencias
+            fetch('/api/proxy')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.incidencias) {
+                        state.incidencias = data.incidencias.slice(0, 5).map((inc, i) => ({
+                            id: i,
+                            titulo: inc.asunto || inc.tipo || 'Sin título',
+                            desc: (inc.comunidad || '') + ' - ' + (inc.propiedad || ''),
+                            estado: inc.estado || 'Pendiente',
+                            proveedor: inc.proveedor || 'N/A',
+                            oficio: inc.oficio || 'General',
+                            fecha: inc.fechaAlta || '---'
                         }));
-                        console.log('✓ Incidencias cargadas:', state.incidencias.length);
-                        updateIncidenciasUI();
                     }
-                } else {
-                    throw new Error('No se pudo obtener incidencias');
-                }
-            } catch (error) {
-                console.warn('No se pudieron cargar incidencias:', error.message);
-                // Usar datos de ejemplo
-                state.incidencias = [
-                    { id: 1, titulo: 'Reparación de tejado', descripcion: 'Bloque A - Propiedad 1', estado: 'Pendiente', tipo: 'incidencia', fecha: '2026-10-08' },
-                    { id: 2, titulo: 'Revisión fontanería', descripcion: 'Bloque B - Propiedad 2', estado: 'En progreso', tipo: 'incidencia', fecha: '2026-10-07' }
-                ];
-                updateIncidenciasUI();
-            }
-        }
+                    updateUI();
+                })
+                .catch(e => {
+                    console.log('Cloud Run no disponible, usando ejemplos');
+                    state.incidencias = [
+                        { id: 1, titulo: 'Reparación tejado', desc: 'Bloque A', estado: 'Pendiente', proveedor: 'Juan', oficio: 'Obra', fecha: '2026-10-08' },
+                        { id: 2, titulo: 'Fontanería', desc: 'Bloque B', estado: 'En progreso', proveedor: 'Carlos', oficio: 'Fontanería', fecha: '2026-10-07' }
+                    ];
+                    updateUI();
+                });
 
-        // Cargar borradores
-        function loadBorradores() {
+            // Borradores de ejemplo
             state.borradores = [
-                { id: 1, titulo: 'Respuesta sobre solicitud de reparación', asunto: 'Solicitud pendiente', tipo: 'email', fecha: '2026-10-09' },
-                { id: 2, titulo: 'Presupuesto para reformas', asunto: 'Cotización solicitada', tipo: 'email', fecha: '2026-10-09' },
-                { id: 3, titulo: 'Confirmación de reunión', asunto: 'Próxima semana', tipo: 'email', fecha: '2026-10-08' }
+                { id: 1, titulo: 'Respuesta reparación', asunto: 'Solicitud pendiente', fecha: '2026-10-09' },
+                { id: 2, titulo: 'Presupuesto reformas', asunto: 'Cotización', fecha: '2026-10-09' }
             ];
-            updateBorradoresUI();
+
+            // Dudas
+            state.dudas = [
+                { id: 1, titulo: '¿Estado incidencia #45?', desc: 'Revisar Fynkus', fecha: new Date().toLocaleDateString() },
+                { id: 2, titulo: '¿Confirmó el proveedor?', desc: 'Pendiente confirmación', fecha: new Date().toLocaleDateString() }
+            ];
+
+            // Cargar completadas
+            const saved = localStorage.getItem('semaforo_completadas');
+            if (saved) state.completadas = JSON.parse(saved);
+
+            updateUI();
         }
 
-        // Actualizar UI de incidencias
-        function updateIncidenciasUI() {
-            const list = document.getElementById('incidencias-list');
-            const status = document.getElementById('incidencias-status');
+        function updateUI() {
+            console.log('✓ Actualizando UI');
 
-            if (state.incidencias.length === 0) {
-                list.innerHTML = '<div class="empty-state">No hay incidencias en este momento</div>';
-                status.textContent = '⚠ Sin incidencias';
-                status.className = 'status-badge status-loading';
+            // Incidencias
+            const inc_list = document.getElementById('incidencias-list');
+            if (state.incidencias.length > 0) {
+                inc_list.innerHTML = state.incidencias.map(i =>
+                    '<div class="item" onclick="openModal(\'incidencia\',' + i.id + ')"><div class="item-title">' + i.titulo + '</div><div class="item-desc">' + i.desc + '</div></div>'
+                ).join('');
+                document.getElementById('incidencias-status').textContent = '✓ ' + state.incidencias.length + ' activas';
             } else {
-                list.innerHTML = state.incidencias.map(inc => `
-                    <div class="item" onclick="openModal('incidencia', ${inc.id})">
-                        <div class="item-title">${inc.titulo}</div>
-                        <div class="item-desc">${inc.descripcion}</div>
-                    </div>
-                `).join('');
-                status.textContent = `✓ ${state.incidencias.length} activas`;
-                status.className = 'status-badge status-ready';
+                inc_list.innerHTML = '<div class="empty-state">Sin incidencias</div>';
+            }
+
+            // Borradores
+            const bor_list = document.getElementById('borradores-list');
+            bor_list.innerHTML = state.borradores.map(b =>
+                '<div class="item" onclick="openModal(\'email\',' + b.id + ')"><div class="item-title">' + b.titulo + '</div><div class="item-desc">' + b.asunto + '</div></div>'
+            ).join('');
+
+            // Dudas
+            const dud_list = document.getElementById('dudas-list');
+            dud_list.innerHTML = state.dudas.map(d =>
+                '<div class="item" onclick="openModal(\'duda\',' + d.id + ')"><div class="item-title">' + d.titulo + '</div><div class="item-desc">' + d.desc + '</div></div>'
+            ).join('');
+
+            // Completadas
+            const comp_list = document.getElementById('completadas-list');
+            if (state.completadas.length > 0) {
+                comp_list.innerHTML = state.completadas.map(c =>
+                    '<div class="item" onclick="openModal(\'completada\',' + c.id + ')"><div class="item-title">' + c.titulo + '</div><div class="item-desc">' + c.desc + '</div></div>'
+                ).join('');
+                document.getElementById('completadas-count').textContent = state.completadas.length + ' completadas';
+            } else {
+                document.getElementById('completadas-count').textContent = '0 completadas';
             }
         }
 
-        // Actualizar UI de borradores
-        function updateBorradoresUI() {
-            const list = document.getElementById('borradores-list');
-
-            if (state.borradores.length === 0) {
-                list.innerHTML = '<div class="empty-state">No hay borradores</div>';
-            } else {
-                list.innerHTML = state.borradores.map(bor => `
-                    <div class="item" onclick="openModal('email', ${bor.id})">
-                        <div class="item-title">${bor.titulo}</div>
-                        <div class="item-desc">${bor.asunto}</div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // Actualizar UI de dudas
-        function updateDudasUI() {
-            const list = document.getElementById('dudas-list');
-            const activeDudas = state.dudas.filter(d => !d.completada);
-
-            if (activeDudas.length === 0) {
-                list.innerHTML = '<div class="empty-state">No hay dudas pendientes</div>';
-            } else {
-                list.innerHTML = activeDudas.map(duda => `
-                    <div class="item" onclick="openModal('duda', ${duda.id})">
-                        <div class="item-title">${duda.titulo}</div>
-                        <div class="item-desc">${duda.descripcion}</div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // Actualizar UI de completadas
-        function updateCompletadasUI() {
-            const list = document.getElementById('completadas-list');
-            const count = document.getElementById('completadas-count');
-            const completadas = state.completadas.filter(c => !c.removida);
-
-            if (completadas.length === 0) {
-                list.innerHTML = '<div class="empty-state">Sin tareas completadas</div>';
-                count.textContent = '0 completadas';
-            } else {
-                list.innerHTML = completadas.map(comp => `
-                    <div class="item" onclick="openModal('completada', ${comp.id})">
-                        <div class="item-title">${comp.titulo}</div>
-                        <div class="item-desc">${comp.descripcion}</div>
-                    </div>
-                `).join('');
-                count.textContent = `${completadas.length} completadas`;
-            }
-        }
-
-        // Abrir modal con detalles
         function openModal(type, id) {
             let item = null;
-
-            if (type === 'incidencia') {
-                item = state.incidencias.find(i => i.id === id);
-            } else if (type === 'email') {
-                item = state.borradores.find(b => b.id === id);
-            } else if (type === 'duda') {
-                item = state.dudas.find(d => d.id === id);
-            } else if (type === 'completada') {
-                item = state.completadas.find(c => c.id === id);
-            }
+            if (type === 'incidencia') item = state.incidencias.find(i => i.id === id);
+            else if (type === 'email') item = state.borradores.find(b => b.id === id);
+            else if (type === 'duda') item = state.dudas.find(d => d.id === id);
+            else if (type === 'completada') item = state.completadas.find(c => c.id === id);
 
             if (!item) return;
 
-            state.currentModal = { type, id, item };
+            document.getElementById('modal-title').textContent = item.titulo;
 
-            // Llenar modal
-            const title = document.getElementById('modal-title');
-            const body = document.getElementById('modal-body');
-            const actions = document.getElementById('modal-actions');
-
-            title.textContent = item.titulo;
-
-            // Crear campos
-            let bodyHTML = '<div class="modal-field">';
+            let body = '<div class="modal-field"><span class="modal-label">Descripción:</span><div class="modal-value">' + (item.desc || item.asunto || '---') + '</div></div>';
             if (type === 'incidencia') {
-                bodyHTML += `
-                    <span class="modal-label">Comunidad/Propiedad:</span>
-                    <div class="modal-value">${item.descripcion}</div>
-                </div>
-                <div class="modal-field">
-                    <span class="modal-label">Estado:</span>
-                    <div class="modal-value">${item.estado}</div>
-                </div>
-                <div class="modal-field">
-                    <span class="modal-label">Proveedor:</span>
-                    <div class="modal-value">${item.proveedor || 'No asignado'}</div>
-                </div>
-                <div class="modal-field">
-                    <span class="modal-label">Oficio:</span>
-                    <div class="modal-value">${item.oficio || 'General'}</div>
-                </div>
-                <div class="modal-field">
-                    <span class="modal-label">Fecha:</span>
-                    <div class="modal-value">${item.fecha}</div>
-                </div>`;
-                actions.innerHTML = `
-                    <button class="action-btn action-btn-complete" onclick="completeTask('incidencia', ${id})">✓ Marcar como resuelta</button>
-                    <button class="action-btn action-btn-info" onclick="alert('Abriendo en Fynkus...')">🔗 Abrir en Fynkus</button>
-                    <button class="action-btn action-btn-cancel" onclick="closeModal()">Cerrar</button>
-                `;
-            } else if (type === 'email') {
-                bodyHTML += `
-                    <span class="modal-label">Asunto:</span>
-                    <div class="modal-value">${item.asunto}</div>
-                </div>
-                <div class="modal-field">
-                    <span class="modal-label">Contenido:</span>
-                    <div class="modal-value" style="white-space: pre-wrap; max-height: 150px; overflow-y: auto;">Borrador de email sobre: ${item.titulo}</div>
-                </div>
-                <div class="modal-field">
-                    <span class="modal-label">Fecha:</span>
-                    <div class="modal-value">${item.fecha}</div>
-                </div>`;
-                actions.innerHTML = `
-                    <button class="action-btn action-btn-complete" onclick="completeTask('email', ${id})">✓ Enviar</button>
-                    <button class="action-btn action-btn-info" onclick="alert('Abriendo en Gmail...')">✉ Abrir en Gmail</button>
-                    <button class="action-btn action-btn-cancel" onclick="closeModal()">Cerrar</button>
-                `;
-            } else if (type === 'duda') {
-                bodyHTML += `
-                    <span class="modal-label">Descripción:</span>
-                    <div class="modal-value">${item.descripcion}</div>
-                </div>
-                <div class="modal-field">
-                    <span class="modal-label">Fecha:</span>
-                    <div class="modal-value">${item.fecha}</div>
-                </div>`;
-                actions.innerHTML = `
-                    <button class="action-btn action-btn-complete" onclick="completeTask('duda', ${id})">✓ Resolver duda</button>
-                    <button class="action-btn action-btn-cancel" onclick="closeModal()">Cerrar</button>
-                `;
-            } else if (type === 'completada') {
-                bodyHTML += `
-                    <span class="modal-label">Descripción:</span>
-                    <div class="modal-value">${item.descripcion}</div>
-                </div>
-                <div class="modal-field">
-                    <span class="modal-label">Completada el:</span>
-                    <div class="modal-value">${item.completadaEl}</div>
-                </div>`;
-                actions.innerHTML = `
-                    <button class="action-btn action-btn-cancel" onclick="removeCompleted(${id})">🗑 Eliminar</button>
-                    <button class="action-btn action-btn-cancel" onclick="closeModal()">Cerrar</button>
-                `;
+                body += '<div class="modal-field"><span class="modal-label">Estado:</span><div class="modal-value">' + item.estado + '</div></div>';
+                body += '<div class="modal-field"><span class="modal-label">Proveedor:</span><div class="modal-value">' + item.proveedor + '</div></div>';
+                body += '<div class="modal-field"><span class="modal-label">Oficio:</span><div class="modal-value">' + item.oficio + '</div></div>';
+                body += '<div class="modal-field"><span class="modal-label">Fecha:</span><div class="modal-value">' + item.fecha + '</div></div>';
+            }
+            if (type === 'completada') {
+                body += '<div class="modal-field"><span class="modal-label">Completada el:</span><div class="modal-value">' + item.fecha + '</div></div>';
             }
 
-            body.innerHTML = bodyHTML;
+            document.getElementById('modal-body').innerHTML = body;
 
-            // Mostrar modal
+            let actions = '';
+            if (type === 'incidencia') {
+                actions = '<button class="action-btn action-btn-complete" onclick="complete(\'incidencia\',' + id + ')">✓ Marcar resuelta</button>';
+            } else if (type === 'email') {
+                actions = '<button class="action-btn action-btn-complete" onclick="complete(\'email\',' + id + ')">✓ Enviar</button>';
+            } else if (type === 'duda') {
+                actions = '<button class="action-btn action-btn-complete" onclick="complete(\'duda\',' + id + ')">✓ Resolver</button>';
+            } else if (type === 'completada') {
+                actions = '<button class="action-btn action-btn-cancel" onclick="removeComplete(' + id + ')">Eliminar</button>';
+            }
+            actions += '<button class="action-btn action-btn-cancel" onclick="closeModal()">Cerrar</button>';
+
+            document.getElementById('modal-actions').innerHTML = actions;
             document.getElementById('modal').classList.add('active');
         }
 
-        // Cerrar modal
         function closeModal() {
             document.getElementById('modal').classList.remove('active');
-            state.currentModal = null;
         }
 
-        // Completar tarea
-        function completeTask(type, id) {
+        function complete(type, id) {
             let item = null;
-
             if (type === 'incidencia') {
                 item = state.incidencias.find(i => i.id === id);
                 state.incidencias = state.incidencias.filter(i => i.id !== id);
@@ -686,94 +343,42 @@
             }
 
             if (item) {
-                const completed = {
+                state.completadas.push({
                     id: Date.now(),
                     titulo: item.titulo,
-                    descripcion: item.descripcion || item.asunto,
-                    tipoOriginal: type,
-                    completadaEl: new Date().toLocaleString('es-ES'),
-                    removida: false
-                };
-                state.completadas.push(completed);
-                saveToLocalStorage();
-
-                // Actualizar UIs
-                updateIncidenciasUI();
-                updateBorradoresUI();
-                updateDudasUI();
-                updateCompletadasUI();
-
+                    desc: item.desc || item.asunto || '---',
+                    fecha: new Date().toLocaleString('es-ES')
+                });
+                localStorage.setItem('semaforo_completadas', JSON.stringify(state.completadas));
+                updateUI();
                 closeModal();
-                console.log('✓ Tarea completada:', item.titulo);
-                alert(`✓ "${item.titulo}" marcada como completada`);
+                alert('✓ "' + item.titulo + '" completada');
             }
         }
 
-        // Eliminar de completadas
-        function removeCompleted(id) {
-            const idx = state.completadas.findIndex(c => c.id === id);
-            if (idx !== -1) {
-                state.completadas.splice(idx, 1);
-                saveToLocalStorage();
-                updateCompletadasUI();
-                closeModal();
-                console.log('✓ Completada eliminada');
-            }
+        function removeComplete(id) {
+            state.completadas = state.completadas.filter(c => c.id !== id);
+            localStorage.setItem('semaforo_completadas', JSON.stringify(state.completadas));
+            updateUI();
+            closeModal();
         }
 
-        // Sincronizar datos
-        async function syncData() {
+        function syncData() {
             const btn = event.target;
             btn.disabled = true;
             btn.textContent = '⟳ Sincronizando...';
-
-            try {
-                // Recargar incidencias
-                await loadIncidencias();
-
-                // Recargar borradores
-                loadBorradores();
-
-                // Actualizar UIs
-                updateDudasUI();
-                updateCompletadasUI();
-
-                btn.textContent = '✓ Sincronizado';
-                console.log('✓ Datos sincronizados correctamente');
-
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.textContent = '✓ Sincronizar Datos';
-                }, 2000);
-            } catch (error) {
-                console.error('Error sincronizando:', error);
-                btn.textContent = '✗ Error';
+            setTimeout(() => {
+                loadData();
                 btn.disabled = false;
-            }
+                btn.textContent = '✓ Sincronizar';
+            }, 1000);
         }
 
-        // Inicializar
-        window.addEventListener('load', function() {
-            console.log('✓ Dashboard cargando datos...');
-            loadFromLocalStorage();
-            initializeDudas();
-            loadIncidencias();
-            loadBorradores();
-            updateDudasUI();
-            updateCompletadasUI();
-            console.log('✓ Dashboard inicializado completamente');
+        document.getElementById('modal').addEventListener('click', e => {
+            if (e.target === document.getElementById('modal')) closeModal();
         });
 
-        // Cerrar modal al hacer click fuera
-        document.getElementById('modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
+        window.addEventListener('load', loadData);
     </script>
-
-    <div class="footer">
-        <p>Semáforo de Incidencias | Dashboard Interactivo | v2.0 | 2026-10-09</p>
-    </div>
 </body>
 </html>
