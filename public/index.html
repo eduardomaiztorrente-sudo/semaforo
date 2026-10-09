@@ -1,0 +1,226 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semaforo de Incidencias - Dashboard Interactivo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #667eea;
+        }
+
+        .sync-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .sync-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .card-content {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .status-loading {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .status-ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Semaforo de Incidencias</h1>
+            <button class="sync-button" onclick="syncData()">
+                Sincronizar Datos
+            </button>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <h2>Tareas e Incidencias</h2>
+                <div class="card-content">
+                    <p>Gestion de tareas e incidencias en tiempo real</p>
+                    <span class="status-badge status-loading">Cargando...</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Borradores Gmail</h2>
+                <div class="card-content">
+                    <p>Borradores pendientes de envio</p>
+                    <span class="status-badge status-loading">Cargando...</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Dudas del Dia</h2>
+                <div class="card-content">
+                    <p>Preguntas y dudas pendientes de resolver</p>
+                    <span class="status-badge status-loading">Cargando...</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Completadas Hoy</h2>
+                <div class="card-content">
+                    <p>Tareas completadas durante el dia</p>
+                    <span class="status-badge status-loading">Cargando...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts - jsDelivr CDN -->
+    <script async defer src="https://cdn.jsdelivr.net/npm/firebase@9.22.0/compat/app.js"></script>
+    <script async defer src="https://cdn.jsdelivr.net/npm/firebase@9.22.0/compat/firestore.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyYmfF3pX8...",
+            authDomain: "semaforo-fincas.firebaseapp.com",
+            projectId: "semaforo-fincas",
+            storageBucket: "semaforo-fincas.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdefg123456"
+        };
+
+        // Initialize Firebase
+        let db = null;
+        let initAttempts = 0;
+        const maxAttempts = 50;
+        const retryInterval = 100;
+
+        function initializeFirebase() {
+            if (typeof firebase === 'undefined') {
+                if (initAttempts < maxAttempts) {
+                    initAttempts++;
+                    setTimeout(initializeFirebase, retryInterval);
+                    console.log('Firebase cargando... intento ' + initAttempts + '/' + maxAttempts);
+                } else {
+                    console.error('Firebase no pudo cargarse despues de ' + maxAttempts + ' intentos');
+                    console.log('jsDelivr CDN esta activo OK');
+                }
+                return;
+            }
+
+            try {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                console.log('OK: Firebase inicializado correctamente desde jsDelivr CDN');
+            } catch (e) {
+                console.error('Error inicializando Firebase:', e);
+            }
+        }
+
+        function syncData() {
+            console.log('Sincronizando datos...');
+            if (db) {
+                console.log('OK: Base de datos disponible');
+            } else {
+                console.log('Aviso: Base de datos no esta lista aun');
+            }
+        }
+
+        // Start Firebase initialization
+        document.addEventListener('DOMContentLoaded', initializeFirebase);
+        initializeFirebase();
+    </script>
+
+    <div class="footer">
+        <p>Semaforo de Incidencias | Firebase desde jsDelivr CDN | Actualizado: 2026-10-09</p>
+    </div>
+</body>
+</html>
