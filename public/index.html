@@ -628,7 +628,7 @@
 
         async function cargarCalendario() {
             try {
-                const url = `${GOOGLE_APPS_SCRIPT_URL}?action=calendar`;
+                const url = `${CORS_PROXY}${encodeURIComponent(GOOGLE_APPS_SCRIPT_URL + '?action=calendar')}`;
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -675,7 +675,7 @@
 
         async function cargarCorreos() {
             try {
-                const url = `${GOOGLE_APPS_SCRIPT_URL}?action=emails`;
+                const url = `${CORS_PROXY}${encodeURIComponent(GOOGLE_APPS_SCRIPT_URL + '?action=emails')}`;
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -757,7 +757,7 @@
 
         async function cargarTareas() {
             try {
-                const url = `${GOOGLE_APPS_SCRIPT_URL}?action=tasks`;
+                const url = `${CORS_PROXY}${encodeURIComponent(GOOGLE_APPS_SCRIPT_URL + '?action=tasks')}`;
                 const response = await fetch(url);
                 const data = await response.json();
 
@@ -811,3 +811,4 @@
     </script>
 </body>
 </html>
+
